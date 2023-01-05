@@ -83,7 +83,7 @@ class WalletsListView extends ListView {
         messageLayer.style.webkitFontSmoothing = 'subpixel-antialiased'
         messageLayer.style.fontWeight = '300'
       }
-      messageLayer.innerHTML = "Welcome to MyMonero!<br/>Let's get started."
+      messageLayer.innerHTML = "Welcome to MyBeldex!<br/>Let's get started."
 
       contentContainerLayer.appendChild(messageLayer)
 
@@ -201,7 +201,7 @@ class WalletsListView extends ListView {
   //
   Navigation_Title () {
     const self = this
-    return `<a href="https://mymonero.com" target="_blank" style="text-decoration: none; color: rgb(252, 251, 252); "><span style='width: 30px; height: 20px; display: inline-block; margin-right: 6px;'><span class='title-logo'>&nbsp;</span></span>MyMonero v${self.context.version}</a>`
+    return `<a href="https://mymonero.com" target="_blank" style="text-decoration: none; color: rgb(252, 251, 252); "><span style='width: 30px; height: 20px; display: inline-block; margin-right: 6px;'><span class='title-logo'>&nbsp;</span></span>MyBeldex v${self.context.version}</a>`
   }
 
   Navigation_New_RightBarButtonView () {

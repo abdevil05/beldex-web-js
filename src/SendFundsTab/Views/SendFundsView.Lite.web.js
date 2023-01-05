@@ -157,7 +157,7 @@ class SendFundsView extends View {
     {
       const labelLayer = commonComponents_forms.New_fieldTitle_labelLayer('FROM', self.context)
       {
-        const tooltipText = 'Monero makes transactions<br/>with your "available outputs",<br/>so part of your balance will<br/>be briefly locked and then<br/>returned as change.'
+        const tooltipText = 'Beldex makes transactions<br/>with your "available outputs",<br/>so part of your balance will<br/>be briefly locked and then<br/>returned as change.'
         const view = commonComponents_tooltips.New_TooltipSpawningButtonView(tooltipText, self.context)
         const layer = view.layer
         labelLayer.appendChild(layer) // we can append straight to labelLayer as we don't ever change its innerHTML
@@ -241,7 +241,7 @@ class SendFundsView extends View {
       breakingDiv.appendChild(layer)
     }
     {
-      const tooltipText = 'Based on Monero network<br/>fee estimate (not final).<br/><br/>MyMonero does not charge<br/>a transfer service fee.'
+      const tooltipText = 'Based on Beldex network<br/>fee estimate (not final).<br/><br/>MyBeldex does not charge<br/>a transfer service fee.'
       const view = commonComponents_tooltips.New_TooltipSpawningButtonView(tooltipText, self.context)
       const layer = view.layer
       breakingDiv.appendChild(layer)
@@ -259,7 +259,7 @@ class SendFundsView extends View {
     const self = this
     const layer = commonComponents_contactPicker_Lite.New_contactPickerLayer_Lite(
       self.context,
-      'Email, domain, or Monero address',
+      'Email, domain, or Beldex address',
       function (event) { // didFinishTypingInInput_fn
         self._didFinishTypingInContactPickerInput(event)
       }
@@ -275,7 +275,7 @@ class SendFundsView extends View {
     const labelLayer = commonComponents_forms.New_fieldTitle_labelLayer('TO', self.context)
     labelLayer.style.marginTop = '17px' // to square with MEMO field on Send Funds
     {
-      const tooltipText = 'Drag &amp; drop QR codes<br/>to auto-fill.<br/><br/>Please double-check<br/>your recipient info as<br/>Monero transfers are<br/>not yet&nbsp;reversible.'
+      const tooltipText = 'Drag &amp; drop QR codes<br/>to auto-fill.<br/><br/>Please double-check<br/>your recipient info as<br/>Beldex transfers are<br/>not yet&nbsp;reversible.'
       const view = commonComponents_tooltips.New_TooltipSpawningButtonView(tooltipText, self.context)
       const layer = view.layer
       labelLayer.appendChild(layer) // we can append straight to labelLayer as we don't ever change its innerHTML
@@ -312,7 +312,7 @@ class SendFundsView extends View {
       div.appendChild(fieldContainerLayer)
       fieldContainerLayer.style.display = 'none' // initial state
       {
-        const labelLayer = commonComponents_forms.New_fieldTitle_labelLayer('MONERO ADDRESS', self.context)
+        const labelLayer = commonComponents_forms.New_fieldTitle_labelLayer('BELDEX ADDRESS', self.context)
         labelLayer.style.marginTop = '12px' // instead of 15
         fieldContainerLayer.appendChild(labelLayer)
         //
@@ -466,7 +466,7 @@ class SendFundsView extends View {
       const labelLayer = commonComponents_forms.New_fieldTitle_labelLayer('PRIORITY', self.context)
       labelLayer.style.marginTop = '4px'
       {
-        const tooltipText = 'You can pay the Monero<br/>network a higher fee to<br/>have your transfers<br/>confirmed faster.'
+        const tooltipText = 'We currently only support normal fee <br/>Flash tx will be comming in upcomming versions <br/>Thank you .'
         const view = commonComponents_tooltips.New_TooltipSpawningButtonView(tooltipText, self.context)
         const layer = view.layer
         labelLayer.appendChild(layer) // we can append straight to labelLayer as we don't ever change its innerHTML
@@ -485,12 +485,13 @@ class SendFundsView extends View {
         const defaultValue = monero_sendingFunds_utils.default_priority()
         const values =
         [
-          1,
-          2,
-          3,
-          4
+          1
+          // 2,
+          // 3,
+          // 4
         ]
-        const descriptions = ['Low', 'Medium', 'High', 'Very High']
+        // const descriptions = ['Low', 'Medium', 'High', 'Very High']
+        const descriptions = ['Normal']
         const numberOf_values = values.length
         for (let i = 0; i < numberOf_values; i++) {
           const value = values[i]
@@ -837,7 +838,7 @@ class SendFundsView extends View {
   // Runtime - Accessors - Navigation
   //
   Navigation_Title () {
-    return 'Send Monero'
+    return 'Send Beldex'
   }
 
   Navigation_New_RightBarButtonView () {
@@ -863,7 +864,7 @@ class SendFundsView extends View {
     const estimatedNetworkFee_JSBigInt = new JSBigInt(self.context.monero_utils.estimated_tx_network_fee(
       null, // deprecated - will be removed soon
       self._selected_simplePriority(),
-      '24658' // TODO: grab this from wallet via API request
+      '666','100000' // TODO: grab this from wallet via API request
     ))
     const estimatedTotalFee_JSBigInt = estimatedNetworkFee_JSBigInt // no tx hosting service fee
     //
@@ -1308,7 +1309,7 @@ class SendFundsView extends View {
     const wallet = self.walletSelectView.CurrentlySelectedRowItem
     {
       if (typeof wallet === 'undefined' || !wallet) {
-        _trampolineToReturnWithValidationErrorString('Please create a wallet to send Monero.')
+        _trampolineToReturnWithValidationErrorString('Please create a wallet to send Beldex.')
         return
       }
     }
@@ -1740,7 +1741,7 @@ class SendFundsView extends View {
           // Our library returns a map with between 0 and 2 keys
           if (responseMap.size == 0) {
             // no monero address
-            let errorString = `There is no Monero address associated with "${enteredPossibleAddress}"`
+            let errorString = `There is no Beldex address associated with "${enteredPossibleAddress}"`
             self.validationMessageLayer.SetValidationError(errorString);
           } else if (responseMap.size == 1) {
             self.isYat = isYat;
@@ -1802,7 +1803,7 @@ class SendFundsView extends View {
       try {
         address__decode_result = self.context.monero_utils.decode_address(enteredPossibleAddress, self.context.nettype)
       } catch (e) {
-        console.warn("Couldn't decode as a Monero address.", e)
+        console.warn("Couldn't decode as a Beldex address.", e)
         self.isResolvingSendTarget = false
         self.set_isSubmittable_needsUpdate()
         return // just return silently

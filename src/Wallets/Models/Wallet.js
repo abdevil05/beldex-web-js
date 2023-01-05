@@ -886,7 +886,7 @@ class Wallet extends EventEmitter {
     if (nBlocksBehind >= 10) {
       return true
     } else if (nBlocksBehind < 0) {
-      throw 'nBlocksBehind < 0' // maybe replace with warn log
+      console.warn( 'nBlocksBehind < 0') // maybe replace with warn log
       // return false
     }
     return false
@@ -923,7 +923,8 @@ class Wallet extends EventEmitter {
 
   IsTransactionConfirmed (tx) {
     const self = this
-    const blockchain_height = self.blockchain_height
+    const blockchain_height = self.account_scanned_height
+
     //
     return monero_txParsing_utils.IsTransactionConfirmed(tx, blockchain_height)
   }
@@ -1163,7 +1164,7 @@ class Wallet extends EventEmitter {
       self.context.userIdleInWindowController.ReEnable_userIdle()
     }
     const raw_amount_string = destinations[0].send_amount
-    const statusUpdate_messageBase = isSweepTx ? 'Sending wallet balance…' : `Sending ${raw_amount_string} XMR…`
+    const statusUpdate_messageBase = isSweepTx ? 'Sending wallet balance…' : `Sending ${raw_amount_string} BDX…`
     const processStepMessageSuffix_byEnumVal =
 		{
 		  0: '', // 'none'
@@ -1182,7 +1183,7 @@ class Wallet extends EventEmitter {
 		  3: 'This wallet must first be imported.',
 		  4: 'Please specify the recipient of this transfer.',
 		  5: "Couldn't resolve this OpenAlias address.",
-		  6: "Couldn't validate destination Monero address.",
+		  6: "Couldn't validate destination Beldex address.",
 		  7: 'Please enter a valid payment ID.',
 		  8: "Couldn't construct integrated address with short payment ID.",
 		  9: "The amount you've entered is too low.",

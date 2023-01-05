@@ -41,7 +41,7 @@ class TransactionDetailsView extends View {
       self.layer.appendChild(layer)
     }
     {
-      const layer = commonComponents_tables.New_inlineMessageDialogLayer(self.context, 'Your Monero is on its way.', false)
+      const layer = commonComponents_tables.New_inlineMessageDialogLayer(self.context, 'Your Beldex is on its way.', false)
       layer.style.width = 'calc(100% - 0px)'
       layer.style.marginLeft = '0px'
       self.validationMessageLayer__onItsWay = layer
