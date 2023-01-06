@@ -259,7 +259,7 @@ class SendFundsView extends View {
     const self = this
     const layer = commonComponents_contactPicker_Lite.New_contactPickerLayer_Lite(
       self.context,
-      'Email, domain, or Beldex address',
+      'Beldex address',
       function (event) { // didFinishTypingInInput_fn
         self._didFinishTypingInContactPickerInput(event)
       }

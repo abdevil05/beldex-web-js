@@ -15,7 +15,7 @@ window.BootApp = async function () { // encased in a function to prevent scope b
     isDebug: false,
     isMobile: isMobile,
     TabBarView_thickness: isMobile ? 48 : 79,
-    appDownloadLink_domainAndPath: 'https://mymonero.com',
+    appDownloadLink_domainAndPath: 'https://www.beldex.io/',
     appRepoLink: 'https://github.com/Beldex-Coin/beldex-libapp-js',
     HostedMoneroAPIClient_DEBUGONLY_mockSendTransactionSuccess: false,
     monero_utils: coreBridgeInstance
