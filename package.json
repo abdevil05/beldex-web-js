@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "(webpack --mode=development) & node server",
     "build": "webpack --mode=production",
-    "start": "(webpack --mode=development) & node server",
+    "start": "(webpack --mode=production) & node server",
     "watch": "(webpack --mode=development --watch) & node server"
   },
   "engines": {
