@@ -466,7 +466,7 @@ class SendFundsView extends View {
       const labelLayer = commonComponents_forms.New_fieldTitle_labelLayer('PRIORITY', self.context)
       labelLayer.style.marginTop = '4px'
       {
-        const tooltipText = 'We currently only support normal fee <br/>Flash tx will be comming in upcomming versions <br/>Thank you .'
+        const tooltipText = 'Current default will be normal fee .For both Normal and Flash takes same time to confirm in web wallet <br/><br/>Thank you .'
         const view = commonComponents_tooltips.New_TooltipSpawningButtonView(tooltipText, self.context)
         const layer = view.layer
         labelLayer.appendChild(layer) // we can append straight to labelLayer as we don't ever change its innerHTML
@@ -485,13 +485,14 @@ class SendFundsView extends View {
         const defaultValue = monero_sendingFunds_utils.default_priority()
         const values =
         [
-          1
+          1,
+          5
           // 2,
           // 3,
           // 4
         ]
         // const descriptions = ['Low', 'Medium', 'High', 'Very High']
-        const descriptions = ['Normal']
+        const descriptions = ['Normal','Flash']
         const numberOf_values = values.length
         for (let i = 0; i < numberOf_values; i++) {
           const value = values[i]
