@@ -5,12 +5,12 @@ const EventEmitter = require('events')
 const extend = require('util')._extend
 const uuidV1 = require('uuid/v1')
 //
-const monero_txParsing_utils = require('@mymonero/mymonero-tx-parsing-utils')
-const monero_sendingFunds_utils = require('@mymonero/mymonero-sendfunds-utils')
-const JSBigInt = require('@mymonero/mymonero-bigint').BigInteger
-const monero_amount_format_utils = require('@mymonero/mymonero-money-format')
-const monero_config = require('@mymonero/mymonero-monero-config')
-const mnemonic_languages = require('@mymonero/mymonero-locales')
+const monero_txParsing_utils = require('@bdxi/beldex-tx-parsing-utils')
+const monero_sendingFunds_utils = require('@bdxi/beldex-sendfunds-utils')
+const JSBigInt = require('@bdxi/beldex-bigint').BigInteger
+const beldex_amount_format_utils = require('@bdxi/beldex-money-format')
+const beldex_config = require('@bdxi/beldex-config')
+const mnemonic_languages = require('@bdxi/beldex-locales')
 //
 const persistable_object_utils = require('../../DocumentPersister/persistable_object_utils')
 const wallet_persistence_utils = require('./wallet_persistence_utils')
@@ -1001,7 +1001,7 @@ class Wallet extends EventEmitter {
     const self = this
     const balance_JSBigInt = self.Balance_JSBigInt()
     //
-    return monero_amount_format_utils.formatMoney(balance_JSBigInt)
+    return beldex_amount_format_utils.formatMoney(balance_JSBigInt)
   }
 
   Balance_DoubleNumber () {
@@ -1034,7 +1034,7 @@ class Wallet extends EventEmitter {
     const self = this
     const lockedBalance_JSBigInt = self.LockedBalance_JSBigInt()
     //
-    return monero_amount_format_utils.formatMoney(lockedBalance_JSBigInt)
+    return beldex_amount_format_utils.formatMoney(lockedBalance_JSBigInt)
   }
 
   LockedBalance_DoubleNumber () {
@@ -1067,7 +1067,7 @@ class Wallet extends EventEmitter {
   AmountPending_FormattedString () { // provided for convenience mainly so consumers don't have to require monero_utils
     const self = this
 
-    return monero_amount_format_utils.formatMoney(self.AmountPending_JSBigInt())
+    return beldex_amount_format_utils.formatMoney(self.AmountPending_JSBigInt())
   }
 
   AmountPending_DoubleNumber () {
@@ -1279,7 +1279,7 @@ class Wallet extends EventEmitter {
       //
       const total_sent__JSBigInt = new JSBigInt('' + params.total_sent)
       const total_sent__atomicUnitString = total_sent__JSBigInt.toString()
-      const total_sent__floatString = monero_amount_format_utils.formatMoney(total_sent__JSBigInt)
+      const total_sent__floatString = beldex_amount_format_utils.formatMoney(total_sent__JSBigInt)
       const total_sent__float = parseFloat(total_sent__floatString)
       //
       const mockedTransaction =
@@ -1329,10 +1329,10 @@ class Wallet extends EventEmitter {
       } else if (code === 12) { // createTransactionCode_balancesProvided
         if (params.createTx_errCode == 90) { // needMoreMoneyThanFound
           errStr = `Spendable balance too low. Have ${
-						monero_amount_format_utils.formatMoney(new JSBigInt('' + params.spendable_balance))
-					} ${monero_config.coinSymbol}; need ${
-						monero_amount_format_utils.formatMoney(new JSBigInt('' + params.required_balance))
-					} ${monero_config.coinSymbol}.`
+						beldex_amount_format_utils.formatMoney(new JSBigInt('' + params.spendable_balance))
+					} ${beldex_config.coinSymbol}; need ${
+						beldex_amount_format_utils.formatMoney(new JSBigInt('' + params.required_balance))
+					} ${beldex_config.coinSymbol}.`
         } else {
           errStr = createTxErrCodeMessage_byEnumVal[params.createTx_errCode]
         }

@@ -1,7 +1,7 @@
 'use strict'
 
 const request = require('xhr')
-const OpenAlias = require('@mymonero/mymonero-openalias')
+const OpenAlias = require('@bdxi/beldex-openalias')
 
 //TODO: instead of having the TXTRecords function, use instance of OpenAlias instead
 class TXTResolver {

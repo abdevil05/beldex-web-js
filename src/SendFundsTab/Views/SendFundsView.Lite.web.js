@@ -10,17 +10,17 @@ const WalletsSelectView = require('../../WalletsList/Views/WalletsSelectView.web
 const commonComponents_activityIndicators = require('../../MMAppUICommonComponents/activityIndicators.web')
 const commonComponents_actionButtons = require('../../MMAppUICommonComponents/actionButtons.web')
 const JustSentTransactionDetailsView = require('./JustSentTransactionDetailsView.web')
-const monero_sendingFunds_utils = require('@mymonero/mymonero-sendfunds-utils')
+const monero_sendingFunds_utils = require('@bdxi/beldex-sendfunds-utils')
 const monero_openalias_utils = require('../../OpenAlias/monero_openalias_utils')
-const monero_config = require('@mymonero/mymonero-monero-config')
-const monero_amount_format_utils = require('@mymonero/mymonero-money-format')
+const beldex_config = require('@bdxi/beldex-config')
+const beldex_amount_format_utils = require('@bdxi/beldex-money-format')
 const jsQR = require('jsqr')
-const monero_requestURI_utils = require('@mymonero/mymonero-request-utils')
+const monero_requestURI_utils = require('@bdxi/beldex-request-utils')
 const Currencies = require('../../CcyConversionRates/Currencies')
-const JSBigInt = require('@mymonero/mymonero-bigint').BigInteger // important: grab defined export
+const JSBigInt = require('@bdxi/beldex-bigint').BigInteger // important: grab defined export
 const rateServiceDomainText = 'cryptocompare.com'
 const commonComponents_contactPicker_Lite = require('../../MMAppUICommonComponents/contactPicker.Lite.web')
-const YatMoneroLookup = require('@mymonero/mymonero-yat-lookup');
+const YatMoneroLookup = require('@bdxi/beldex-yat-lookup');
 let yatMoneroLookup = new YatMoneroLookup({});
 
 class SendFundsView extends View {
@@ -894,7 +894,7 @@ class SendFundsView extends View {
     if (xmr_estMaxAmount == null || typeof xmr_estMaxAmount === 'undefined') {
       return null
     }
-    const xmr_estMaxAmount_str = monero_amount_format_utils.formatMoney(xmr_estMaxAmount)
+    const xmr_estMaxAmount_str = beldex_amount_format_utils.formatMoney(xmr_estMaxAmount)
     //
     const displayCcySymbol = self.ccySelectLayer.Component_selected_ccySymbol()
     if (displayCcySymbol != Currencies.ccySymbolsByCcy.XMR) {
@@ -929,7 +929,7 @@ class SendFundsView extends View {
   _new_estimatedNetworkFee_displayString () {
     const self = this
     const estimatedTotalFee_JSBigInt = self.new_xmr_estFeeAmount()
-    const estimatedTotalFee_str = monero_amount_format_utils.formatMoney(estimatedTotalFee_JSBigInt)
+    const estimatedTotalFee_str = beldex_amount_format_utils.formatMoney(estimatedTotalFee_JSBigInt)
     const estimatedTotalFee_moneroAmountDouble = parseFloat(estimatedTotalFee_str)
 
     // const estimatedTotalFee_moneroAmountDouble = 0.028
@@ -1111,9 +1111,9 @@ class SendFundsView extends View {
       )
       finalizable_text = `~ ${displayFormattedAmount} ${displayCcySymbol}`
     } else {
-      const moneroAmountDouble_atomicPlaces = xmrAmountDouble * Math.pow(10, monero_config.coinUnitPlaces)
+      const moneroAmountDouble_atomicPlaces = xmrAmountDouble * Math.pow(10, beldex_config.coinUnitPlaces)
       const moneroAmount = new JSBigInt(moneroAmountDouble_atomicPlaces)
-      const formatted_moneroAmount = monero_amount_format_utils.formatMoney(moneroAmount)
+      const formatted_moneroAmount = beldex_amount_format_utils.formatMoney(moneroAmount)
       finalizable_text = `= ${formatted_moneroAmount} ${Currencies.ccySymbolsByCcy.XMR}`
     }
     const final_text = finalizable_text

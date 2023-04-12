@@ -6,8 +6,8 @@ const ValidationLibrary = require('wallet-address-validator')
 const View = require('../../Views/View.web')
 const commonComponents_navigationBarButtons = require('../../MMAppUICommonComponents/navigationBarButtons.web')
 const commonComponents_activityIndicators = require('../../MMAppUICommonComponents/activityIndicators.web')
-const JSBigInt = require('@mymonero/mymonero-bigint').BigInteger // important: grab defined export
-const monero_amount_format_utils = require('@mymonero/mymonero-money-format')
+const JSBigInt = require('@bdxi/beldex-bigint').BigInteger // important: grab defined export
+const beldex_amount_format_utils = require('@bdxi/beldex-money-format')
 const ExchangeHelper = require("@mymonero/mymonero-exchange-helper")
 const webComponents = require("@mymonero/mymonero-web-components");
 const pageTemplates = require("@mymonero/mymonero-page-templates");
@@ -20,7 +20,7 @@ let handleOfferError = exchangeHelper.errorHelper.handleOfferError;
 function newEstimatedNetworkFeeString(fee_JSBigInt) {
   const self = this
   const estimatedTotalFee_JSBigInt = fee_JSBigInt;
-  const estimatedTotalFee_str = monero_amount_format_utils.formatMoney(estimatedTotalFee_JSBigInt)
+  const estimatedTotalFee_str = beldex_amount_format_utils.formatMoney(estimatedTotalFee_JSBigInt)
   const estimatedTotalFee_moneroAmountDouble = parseFloat(estimatedTotalFee_str)
 
   // const estimatedTotalFee_moneroAmountDouble = 0.028
