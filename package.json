@@ -15,9 +15,7 @@
     "node": ">=12.4.0"
   },
   "dependencies": {
-
     "@mymonero/mymonero-web-components": "^2.0.2",
-    "@mymonero/mymonero-page-templates": "^2.0.2",
     "@bdxi/beldex-locales": "1.0.0",
     "@bdxi/beldex-money-format": "1.2.0",
     "@bdxi/beldex-config":"1.0.0",
@@ -31,9 +29,10 @@
     "@bdxi/beldex-request-utils": "^1.0.0",
     "@bdxi/beldex-keyimage-cache": "^1.0.0",
     "@bdxi/beldex-web-components": "^1.0.0",
-    "@bdxi/beldex-page-templates": "^1.0.0",
+    "@bdxi/beldex-page-templates": "^1.1.0",
     "@bdxi/beldex-paymentid-utils": "^1.0.0",
     "@bdxi/beldex-sendfunds-utils":"^1.0.0",
+    "@bdxi/beldex-exchange-helper":"^1.0.0",
     "@bdxi/beldex-openalias":"^1.0.0",
     "async": "3.2.2",
     "bitcoin-address-validation": "^1.0.2",
