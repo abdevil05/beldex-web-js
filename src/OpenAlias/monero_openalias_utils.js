@@ -1,10 +1,10 @@
 'use strict'
 
-const monero_config = require('@mymonero/mymonero-monero-config')
+const beldex_config = require('@bdxi/beldex-config')
 // ^-- TODO: remove this
 //
 const openalias_utils = require('./openalias_utils')
-const currency_openAliasPrefix = monero_config.openAliasPrefix
+const currency_openAliasPrefix = beldex_config.openAliasPrefix
 //
 function DoesStringContainPeriodChar_excludingAsXMRAddress_qualifyingAsPossibleOAAddress (address) {
   if (address.indexOf('.') !== -1) {
@@ -68,7 +68,7 @@ function ResolvedMoneroAddressInfoFromOpenAliasAddress (
       try { // verify address is decodable for currency
         monero_utils.decode_address(oaRecord_address, nettype)
       } catch (e) {
-        const errStr = 'Address received by parsing OpenAlias address ' + oaRecord_address + ' was not a valid Monero address: ' + e
+        const errStr = 'Address received by parsing OpenAlias address ' + oaRecord_address + ' was not a valid Beldex address: ' + e
         const error = new Error(errStr) // apparently if this is named err, JS will complain. no-semicolon parsing issue?
         fn(error)
         return

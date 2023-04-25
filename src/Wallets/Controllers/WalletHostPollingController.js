@@ -2,7 +2,7 @@
 //
 const EventEmitter = require('events')
 const manualRefreshCoolDownMinimumTimeInterval_s = 10
-const pollingPeriodTimeInterval_s = 30
+const pollingPeriodTimeInterval_s = 15
 
 class WalletHostPollingController {
   /// /////////////////////////////////////////////////////////////////////////////

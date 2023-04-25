@@ -37,9 +37,10 @@ class ExchangeTabContentView extends StackAndModalNavigationView {
     const self = this
     const wallets = self.context.walletsListController.records // figure it's ready by this point
     const numberOf_wallets = wallets.length
-    const walletsExist = numberOf_wallets !== 0
+    const walletsExist = numberOf_wallets 
     const shallDisable = walletsExist == false // no wallets? disable
-    return shallDisable
+    // return shallDisable
+    return true
   }
 }
 module.exports = ExchangeTabContentView
