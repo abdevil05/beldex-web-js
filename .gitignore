@@ -2,7 +2,7 @@ node_modules
 src/bundle.js
 src/bundle.js.LICENSE.txt
 dist/
-assets/MyMoneroLibAppCpp_WASM.js
-assets/MyMoneroLibAppCpp_WASM.wasm
+assets/BeldexLibAppCpp_WASM.js
+assets/BeldexLibAppCpp_WASM.wasm
 *.DS_Store
 .env

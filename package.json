@@ -18,7 +18,7 @@
     "@bdxi/beldex-locales": "1.0.0",
     "@bdxi/beldex-money-format": "1.2.0",
     "@bdxi/beldex-config":"1.0.0",
-    "@bdxi/beldex-app-bridge":"1.4.0",
+    "@bdxi/beldex-app-bridge":"1.5.0",
     "@bdxi/beldex-response-parser-utils":"^1.2.0",
     "@bdxi/beldex-tx-parsing-utils": "^1.2.0",
     "@bdxi/beldex-hosted-api":"^1.3.0",
