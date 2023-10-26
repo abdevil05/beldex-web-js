@@ -3,6 +3,7 @@
 const TabBarAndContentView = require('../../TabBarView/TabBarAndContentView.web')
 const WalletsTabContentView = require('../../WalletsList/Views/WalletsTabContentView.web')
 const SendTabContentView = require('../../SendFundsTab/Views/SendTabContentView.Lite.web')
+const RegisterTabContentView = require('../../RegisterFundsTab/Views/RegisterTabContentView.Lite.web')
 const RequestTabContentView = require('../../RequestFunds/Views/RequestTabContentView.Lite.web')
 const ContactsTabContentView = require('../../Contacts/Views/ContactsTabContentView.Lite.web')
 const SettingsTabContentView = require('../../Settings/Views/SettingsTabContentView.web')
@@ -64,6 +65,7 @@ class RootTabBarAndContentView extends TabBarAndContentView {
     const context = self.context
     self.walletsTabContentView = new WalletsTabContentView({}, context)
     self.sendTabContentView = new SendTabContentView({}, context)
+    self.RegisterTabContentView = new RegisterTabContentView({}, context)
     self.requestTabContentView = new RequestTabContentView({}, context)
     self.contactsTabContentView = new ContactsTabContentView({}, context)
     self.settingsTabContentView = new SettingsTabContentView({}, context)
@@ -73,6 +75,7 @@ class RootTabBarAndContentView extends TabBarAndContentView {
       [
         self.walletsTabContentView,
         self.sendTabContentView,
+        self.RegisterTabContentView,
         self.requestTabContentView,
         self.contactsTabContentView,
         self.exchangeTabContentView,
@@ -130,6 +133,27 @@ class RootTabBarAndContentView extends TabBarAndContentView {
         }
       )
     }
+    { // walletAppCoordinator
+      const emitter = self.context.walletAppCoordinator
+      emitter.on(
+        emitter.EventName_willTrigger_sendFundsToContact(),
+        function () {
+          self._selectTab_withContentView(self.RegisterTabContentView)
+        }
+      )
+      emitter.on(
+        emitter.EventName_willTrigger_requestFundsFromContact(),
+        function () {
+          self._selectTab_withContentView(self.requestTabContentView)
+        }
+      )
+      emitter.on(
+        emitter.EventName_willTrigger_sendFundsFromWallet(),
+        function () {
+          self._selectTab_withContentView(self.RegisterTabContentView)
+        }
+      )
+    }
     { // drag and drop - stuff like tab auto-selection
       function _isAllowedToPerformDropOps () {
         if (self.context.passwordController.HasUserEnteredValidPasswordYet() === false) {
@@ -178,6 +202,27 @@ class RootTabBarAndContentView extends TabBarAndContentView {
           } else { //
           }
         }
+        if (numberOfDragsActive === 1) { // first time since started drag that entered self.layer - becomes 0 on real dragleave
+          if (_isAllowedToPerformDropOps()) {
+            const indexOf_RegisterTabContentView = self.IndexOfTabBarContentView(self.RegisterTabContentView)
+            if (indexOf_RegisterTabContentView === self._currentlySelectedTabBarItemIndex) {
+              // NOTE: we are not currently able to call self.selectTab_sendFunds below, because it causes
+              // some sort of issue where, I'm guessing, when the current tab view is removed, it doesn't
+              // fire its corresponding dragleave event, which means we never end up being able to disable
+              // the drag drop zone cause we never receive the final numberOfDragsActive=0 dragleave. For that
+              // reason we're only allowing a drag op to start when we're already on the Send tab
+              // We might be able to solve this somehow but it didn't seem important enough in early stages -PS on 1/27/17
+              //
+              setTimeout(
+                function () { // we must not manipulate the DOM in dragenter/start because that causes dragleave to fire immediately in Chrome.
+                  // self._selectTab_withContentView(self.RegisterTabContentView)
+                  self.RegisterTabContentView._proxied_ondragenter(e)
+                }
+              )
+            }
+          } else { //
+          }
+        }
       }
       self.layer.ondragleave = self.layer.ondragend = function (e) {
         e.preventDefault()
@@ -193,6 +238,20 @@ class RootTabBarAndContentView extends TabBarAndContentView {
         }
         return false
       }
+      self.layer.ondragleave = self.layer.ondragend = function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+
+        numberOfDragsActive--
+        //
+        if (numberOfDragsActive === 0) { // back to 0 - actually left self.layer
+          const indexOf_RegisterTabContentView = self.IndexOfTabBarContentView(self.RegisterTabContentView)
+          if (indexOf_RegisterTabContentView === self._currentlySelectedTabBarItemIndex) {
+            self.RegisterTabContentView._proxied_ondragleave(e)
+          }
+        }
+        return false
+      }
       self.layer.ondrop = function (e) {
         e.preventDefault()
         e.stopPropagation()
@@ -200,6 +259,16 @@ class RootTabBarAndContentView extends TabBarAndContentView {
         const indexOf_sendTabContentView = self.IndexOfTabBarContentView(self.sendTabContentView)
         if (indexOf_sendTabContentView === self._currentlySelectedTabBarItemIndex) {
           self.sendTabContentView._proxied_ondrop(e)
+        }
+        return false
+      }
+      self.layer.ondrop = function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+        numberOfDragsActive = 0 // reset just in case ondragleave wasn't properly fired due to some DOM manipulation or on drop. can happen.
+        const indexOf_RegisterTabContentView = self.IndexOfTabBarContentView(self.RegisterTabContentView)
+        if (indexOf_RegisterTabContentView === self._currentlySelectedTabBarItemIndex) {
+          self.RegisterTabContentView._proxied_ondrop(e)
         }
         return false
       }

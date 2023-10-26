@@ -1356,7 +1356,244 @@ class Wallet extends EventEmitter {
     }
     self.context.monero_utils.async__send_funds(args)
   }
+  ///
+  RegisterFunds (
+    destinations, 
+    resolvedAddress,
+    manuallyEnteredPaymentID,
+    resolvedPaymentID,
+    hasPickedAContact,
+    resolvedAddress_fieldIsVisible,
+    manuallyEnteredPaymentID_fieldIsVisible,
+    resolvedPaymentID_fieldIsVisible,
+    //
+    contact_payment_id,
+    cached_OAResolved_address,
+    contact_hasOpenAliasAddress,
+    contact_address,
+    //
+    isSweepTx, // when true, amount will be ignored
+    simple_priority,
+    //
+    preSuccess_nonTerminal_statusUpdate_fn, // (String) -> Void
+    canceled_fn, // () -> Void
+    fn // (err?, mockedTransaction?) -> Void
+  ) {
+    const self = this
+    // state-lock the function
+    if (self.isSendingFunds === true) {
+      const errStr = 'Currently already sending funds. Please try again when complete.'
+      const err = new Error(errStr)
+      console.error(errStr)
+      fn(err)
+      return
+    }
+    self.isSendingFunds = true
 
+    //
+    // now that we've done that, we can ask the user idle controller to disable user idle until we're done with this - cause it's not something we want to have interrupted by the user idle controller tearing everything down!!
+    self.context.userIdleInWindowController.TemporarilyDisable_userIdle()
+    //
+    function ___aTerminalCBWasCalled () { // private - no need to call this yourself unless you're writing a trampoline function
+      // Note: This function is to be called before you call fn() anywhere - so we can do critical things like unlocking this method and re-enabling user idle
+      self.isSendingFunds = false
+      //
+      // critical to do on every exit from this method
+      self.context.userIdleInWindowController.ReEnable_userIdle()
+    }
+    const raw_amount_string = destinations[0].send_amount
+    const statusUpdate_messageBase = isSweepTx ? 'Sending wallet balance…' : `Sending ${raw_amount_string} BDX…`
+    const processStepMessageSuffix_byEnumVal =
+		{
+		  0: '', // 'none'
+		  1: '', // "initiating send" - so we don't want a suffix
+		  2: 'Fetching latest balance.',
+		  3: 'Calculating fee.',
+		  4: 'Fetching decoy outputs.',
+		  5: 'Constructing transaction.', // may go back to .calculatingFee
+		  6: 'Submitting transaction.'
+		}
+    const failureCodeMessage_byEnumVal =
+		{
+		  0: '--', // message is provided - this should never get requested
+		  1: 'Unable to load that wallet.',
+		  2: 'Unable to log into that wallet.',
+		  3: 'This wallet must first be imported.',
+		  4: 'Please specify the recipient of this transfer.',
+		  5: "Couldn't resolve this OpenAlias address.",
+		  6: "Couldn't validate destination Beldex address.",
+		  7: 'Please enter a valid payment ID.',
+		  8: "Couldn't construct integrated address with short payment ID.",
+		  9: "The amount you've entered is too low.",
+		  10: 'Please enter a valid amount to send.',
+		  11: '--', // errInServerResponse_withMsg
+		  12: '--', // createTransactionCode_balancesProvided
+		  13: '--', // createTranasctionCode_noBalances
+		  14: 'Unable to construct transaction after many attempts.',
+		  //
+		  99900: 'Please contact support with code: 99900.', // codeFault_manualPaymentID_while_hasPickedAContact
+		  99901: 'Please contact support with code: 99901.', // codeFault_unableToFindResolvedAddrOnOAContact
+		  99902: 'Please contact support with code: 99902.', // codeFault_detectedPIDVisibleWhileManualInputVisible
+		  99903: 'Please contact support with code: 99903.', // codeFault_invalidSecViewKey
+		  99904: 'Please contact support with code: 99904.', // codeFault_invalidSecSpendKey
+		  99905: 'Please contact support with code: 99905.' // codeFault_invalidPubSpendKey
+		}
+    const createTxErrCodeMessage_byEnumVal =
+		{
+		  0: 'No error',
+		  1: 'No destinations provided',
+		  2: 'Wrong number of mix outputs provided',
+		  3: 'Not enough outputs for mixing',
+		  4: 'Invalid secret keys',
+		  5: 'Output amount overflow',
+		  6: 'Input amount overflow',
+		  7: 'Mix RCT outs missing commit',
+		  8: 'Result fee not equal to given fee',
+		  9: 'Invalid destination address',
+		  10: 'Payment ID must be blank when using an integrated address',
+		  11: 'Payment ID must be blank when using a subaddress',
+		  12: "Couldn't add nonce to tx extra",
+		  13: 'Invalid pub key',
+		  14: 'Invalid commit or mask on output rct',
+		  15: 'Transaction not constructed',
+		  16: 'Transaction too big',
+		  17: 'Not yet implemented',
+		  18: "Couldn't decode address",
+		  19: 'Invalid payment ID',
+		  20: "The amount you've entered is too low",
+		  21: "Can't get decrypted mask from 'rct' hex",
+		  90: 'Spendable balance too low'
+		}
+    const args =
+		{
+		  fromWallet_didFailToInitialize: self.didFailToInitialize_flag == true,
+		  fromWallet_didFailToBoot: self.didFailToBoot_flag == true,
+      fromWallet_needsImport: false,
+		  requireAuthentication: self.context.settingsController.authentication_requireWhenSending != false,
+		  //
+	          destinations: destinations,
+		  hasPickedAContact: hasPickedAContact,
+		  resolvedAddress_fieldIsVisible: resolvedAddress_fieldIsVisible,
+		  manuallyEnteredPaymentID_fieldIsVisible: manuallyEnteredPaymentID_fieldIsVisible,
+		  resolvedPaymentID_fieldIsVisible: resolvedPaymentID_fieldIsVisible,
+
+		  is_sweeping: isSweepTx,
+		  from_address_string: self.public_address,
+		  sec_viewKey_string: self.private_keys.view,
+		  sec_spendKey_string: self.private_keys.spend,
+		  pub_spendKey_string: self.public_keys.spend,
+		  priority: simple_priority,
+		  nettype: self.context.nettype,
+		  //
+		  resolvedAddress: resolvedAddress, // may be ""
+		  manuallyEnteredPaymentID: manuallyEnteredPaymentID, // may be ""
+		  resolvedPaymentID: resolvedPaymentID, // may be ""
+		  //
+		  contact_payment_id: contact_payment_id, // may be undefined
+		  cached_OAResolved_address: cached_OAResolved_address, // may be undefined
+		  contact_hasOpenAliasAddress: contact_hasOpenAliasAddress, // may be undefined
+		  contact_address: contact_address // may be undefined
+		}
+    args.willBeginSending_fn = function () {
+      preSuccess_nonTerminal_statusUpdate_fn(statusUpdate_messageBase)
+    }
+    args.authenticate_fn = function (cb) {
+      self.context.passwordController.Initiate_VerifyUserAuthenticationForAction(
+        'Authenticate',
+        function () { cb(false) },
+        function () { cb(true) }
+      )
+    }
+    args.status_update_fn = function (params) {
+      const suffix = processStepMessageSuffix_byEnumVal[params.code] // this is kept in JS rather than C++ to allow for localization via the same mechanism as the rest of the app
+      preSuccess_nonTerminal_statusUpdate_fn(`${statusUpdate_messageBase} ${suffix}`) // TODO: localize concatenation
+    }
+    args.canceled_fn = function () {
+      ___aTerminalCBWasCalled()
+      canceled_fn()
+    }
+    args.success_fn = function (params) {
+      ___aTerminalCBWasCalled()
+      //
+      const total_sent__JSBigInt = new JSBigInt('' + params.total_sent)
+      const total_sent__atomicUnitString = total_sent__JSBigInt.toString()
+      const total_sent__floatString = beldex_amount_format_utils.formatMoney(total_sent__JSBigInt)
+      const total_sent__float = parseFloat(total_sent__floatString)
+      //
+      const mockedTransaction =
+			{
+			  hash: params.tx_hash,
+			  mixin: '' + params.mixin,
+			  coinbase: false,
+			  mempool: true,
+			  //
+			  isJustSentTransaction: true, // this is set back to false once the server reports the tx's existence
+			  timestamp: new Date(), // faking
+			  //
+			  unlock_time: 0,
+			  //
+			  // height: null, // mocking the initial value -not- to exist (rather than to erroneously be 0) so that isconfirmed -> false
+			  //
+			  total_sent: total_sent__JSBigInt,
+			  total_received: new JSBigInt('0'),
+			  //
+			  approx_float_amount: -1 * total_sent__float, // -1 cause it's outgoing
+			  // amount: new JSBigInt(sentAmount), // not really used (note if you uncomment, import JSBigInt)
+			  //
+			  payment_id: params.final_payment_id, // b/c `payment_id` may be nil of short pid was used to fabricate an integrated address
+			  //
+			  // info we can only preserve locally
+			  tx_fee: new JSBigInt('' + params.used_fee),
+			  tx_key: params.tx_key,
+			  target_address: params.target_address
+			}
+      fn(null, mockedTransaction, params.isXMRAddressIntegrated, params.integratedAddressPIDForDisplay)
+      //
+      // manually insert .. and subsequent fetches from the server will be
+      // diffed against this, preserving the tx_fee, tx_key, target_address...
+      self._manuallyInsertTransactionRecord(mockedTransaction)
+    }
+    args.error_fn = function (params) {
+      ___aTerminalCBWasCalled()
+      //
+      const code = params.err_code
+      let errStr
+      if (code === 0 || (typeof code === 'undefined' || code === null)) { // msgProvided
+        errStr = params.err_msg
+      } else if (isNaN(code)) {
+        errStr = 'Unexpected NaN err code - please contact support'
+      } else if (code === 11) { // errInServerResponse_withMsg
+        errStr = params.err_msg
+      } else if (code === 12) { // createTransactionCode_balancesProvided
+        if (params.createTx_errCode == 90) { // needMoreMoneyThanFound
+          errStr = `Spendable balance too low. Have ${
+						beldex_amount_format_utils.formatMoney(new JSBigInt('' + params.spendable_balance))
+					} ${beldex_config.coinSymbol}; need ${
+						beldex_amount_format_utils.formatMoney(new JSBigInt('' + params.required_balance))
+					} ${beldex_config.coinSymbol}.`
+        } else {
+          errStr = createTxErrCodeMessage_byEnumVal[params.createTx_errCode]
+        }
+      } else if (code === 13) { // createTranasctionCode_noBalances
+        errStr = createTxErrCodeMessage_byEnumVal[params.createTx_errCode]
+      } else {
+        errStr = failureCodeMessage_byEnumVal[code]
+      }
+      const err = new Error(errStr)
+      console.error(err)
+      fn(err)
+    }
+    args.get_unspent_outs_fn = function (req_params, cb) {
+      self.context.hostedMoneroAPIClient.UnspentOuts(req_params, cb)
+    }
+    args.get_random_outs_fn = function (req_params, cb) {
+      self.context.hostedMoneroAPIClient.RandomOuts(req_params, cb)
+    }
+    args.submit_raw_tx_fn = function (req_params, cb) {
+      self.context.hostedMoneroAPIClient.SubmitRawTx(req_params, cb)
+    }
+    self.context.monero_utils.async__Register_funds(args)
+  }
   //
   // Runtime - Imperatives - Manual refresh
   requestFromUI_manualRefresh () {
