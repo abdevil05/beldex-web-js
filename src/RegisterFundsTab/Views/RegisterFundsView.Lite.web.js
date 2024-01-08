@@ -21,6 +21,7 @@ const JSBigInt = require('@bdxi/beldex-bigint').BigInteger // important: grab de
 const rateServiceDomainText = 'cryptocompare.com'
 const commonComponents_contactPicker_Lite = require('../../MMAppUICommonComponents/contactPicker.Lite.web')
 const YatMoneroLookup = require('@bdxi/beldex-yat-lookup');
+const { log } = require('async')
 let yatMoneroLookup = new YatMoneroLookup({});
 
 class RegisterFundsView extends View {
@@ -136,6 +137,7 @@ class RegisterFundsView extends View {
       self._setup_form_manualPaymentIDInputLayer()
       self._setup_newTextInputField()
       self._handleRegisterButtonClick()
+      self._tryToGenerateRegister()
       self._setup_form_field_priority()
       //
       // initial config
@@ -459,7 +461,28 @@ class RegisterFundsView extends View {
 
   _handleRegisterButtonClick(inputValue) {
     // Handle the "Register" button click with the input value
-    console.log('Register button clicked with input value:', inputValue);
+    // console.log('Register button clicked with input value:', inputValue);
+    // console.log("input values :",inputValue);
+    // console.log("input values %%%% :",typeof inputValue);
+
+    if (inputValue) {
+      // Split the input value into an array of values
+      const valuesArray = inputValue.split(" ");
+    
+      // Create an object dynamically based on the values
+      const myDynamicObject = {};
+    
+      for (let i = 0; i < valuesArray.length; i++) {
+        myDynamicObject[`value${i + 1}`] = valuesArray[i];
+      }
+    
+      console.log(myDynamicObject);
+    } else {
+      console.log("inputValue is undefined or empty");
+    }
+
+    const self = this;
+    self._tryToGenerateRegister()
   
     // Perform registration or other actions here
   }
@@ -792,7 +815,7 @@ class RegisterFundsView extends View {
     }
     { // EventName_willDeconstructBootedStateAndClearPassword
       const emitter = self.context.passwordController
-      if (self._passwordController_EventName_willDeconstructBootedState+AndClearPassword_listenerFn !== null && typeof self._passwordController_EventName_willDeconstructBootedStateAndClearPassword_listenerFn !== 'undefined') {
+      if (self._passwordController_EventName_willDeconstructBootedStateAndClearPassword_listenerFn !== null && typeof self._passwordController_EventName_willDeconstructBootedStateAndClearPassword_listenerFn !== 'undefined') {
         throw Error('self._passwordController_EventName_willDeconstructBootedStateAndClearPassword_listenerFn not nil in ' + self.constructor.name)
       }
       self._passwordController_EventName_willDeconstructBootedStateAndClearPassword_listenerFn = function () {
@@ -1302,9 +1325,10 @@ class RegisterFundsView extends View {
 
   //
   //
-  // Runtime - Imperatives - Send-transaction generation
+  // Runtime - Imperatives - Send-Register  generation
   //
   _tryToGenerateRegister () {
+    console.log("Enter into _tryToGenerateRegister() function ");
     const self = this
     if (self.isSubmitButtonDisabled) {
       console.warn('⚠️  Submit button currently disabled. Bailing.')
@@ -1320,7 +1344,7 @@ class RegisterFundsView extends View {
       //
       self.amountInputLayer.disabled = false
       self.ccySelectLayer.disabled = false
-      self.prioritySelectLayer.disabled = false
+      // self.prioritySelectLayer.disabled = false
       //
       self.manualPaymentIDInputLayer.disabled = false
       self.generateButtonView.SetEnabled(true)
@@ -1333,6 +1357,9 @@ class RegisterFundsView extends View {
         self.chooseFile_buttonView.Enable()
       }
     }
+
+    console.log("After _reEnableFormElements");
+
     { // disable form elements
       self.isFormDisabled = true
       self.set_isSubmittable_needsUpdate() // since we've updated form enabled
@@ -1349,12 +1376,15 @@ class RegisterFundsView extends View {
       //
       self.amountInputLayer.disabled = true
       self.ccySelectLayer.disabled = true
-      self.prioritySelectLayer.disabled = true
+      // self.prioritySelectLayer.disabled = true
       //
       self.contactOrAddressPickerLayer.ContactPicker_inputLayer.disabled = true
       self.manualPaymentIDInputLayer.disabled = true
       self.generateButtonView.SetEnabled(false)
     }
+
+    console.log("After disable form elements");
+
     {
       self._dismissValidationMessageLayer()
     }
@@ -1363,6 +1393,8 @@ class RegisterFundsView extends View {
       _reEnableFormElements()
     }
     //
+    console.log("After _reEnableFormElements ");
+
     const wallet = self.walletSelectView.CurrentlySelectedRowItem
     {
       if (typeof wallet === 'undefined' || !wallet) {
@@ -1370,6 +1402,7 @@ class RegisterFundsView extends View {
         return
       }
     }
+    console.log("after _trampolineToReturnWithValidationErrorString ");
     const sweeping = self.max_buttonView.isMAXToggledOn
     const raw_amount_String = self.amountInputLayer.value
     if (!sweeping) {
@@ -1378,8 +1411,11 @@ class RegisterFundsView extends View {
         return
       }
     }
+    console.log("After  1414 sweeping");
     const selected_ccySymbol = self.ccySelectLayer.Component_selected_ccySymbol()
     let final_XMR_amount_Number = null
+
+    
     if (!sweeping) {
       const rawInput_amount_Number = +raw_amount_String // turns into Number, apparently
       if (isNaN(rawInput_amount_Number)) {
@@ -1438,6 +1474,7 @@ class RegisterFundsView extends View {
     if (enteredAddressValue.includes('.')) {
       enteredAddressValue = resolvedAddress
     }
+    console.log("Before destinations");
 
     const destinations = [
     	{
@@ -1445,7 +1482,7 @@ class RegisterFundsView extends View {
 	      send_amount: '' + final_XMR_amount_Number
       }
     ];
-
+    console.log("Before 1475 in RegisterFundsView.Lite.web.js ");
     //
     // now if using alternate display currency, be sure to ask for terms agreement before doing send
     if (!sweeping && selected_ccySymbol != Currencies.ccySymbolsByCcy.XMR) {
@@ -1520,6 +1557,7 @@ class RegisterFundsView extends View {
     __proceedTo_generateRegisterTransaction()
     //
     function __proceedTo_generateRegisterTransaction () {
+      console.log("__proceedTo_generateRegisterTransaction called :::");
       wallet.RegisterFunds(
         destinations,
         resolvedAddress,

@@ -1482,6 +1482,8 @@ class Wallet extends EventEmitter {
 		  sec_viewKey_string: self.private_keys.view,
 		  sec_spendKey_string: self.private_keys.spend,
 		  pub_spendKey_string: self.public_keys.spend,
+
+      
 		  priority: simple_priority,
 		  nettype: self.context.nettype,
 		  //
@@ -1494,6 +1496,8 @@ class Wallet extends EventEmitter {
 		  contact_hasOpenAliasAddress: contact_hasOpenAliasAddress, // may be undefined
 		  contact_address: contact_address // may be undefined
 		}
+    console.log("public address : ",args.from_address_string);
+
     args.willBeginSending_fn = function () {
       preSuccess_nonTerminal_statusUpdate_fn(statusUpdate_messageBase)
     }
