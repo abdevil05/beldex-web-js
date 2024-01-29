@@ -464,13 +464,13 @@ class RegisterFundsView extends View {
     // console.log('Register button clicked with input value:', inputValue);
     // console.log("input values :",inputValue);
     // console.log("input values %%%% :",typeof inputValue);
-
+    const myDynamicObject = {};
     if (inputValue) {
       // Split the input value into an array of values
       const valuesArray = inputValue.split(" ");
     
       // Create an object dynamically based on the values
-      const myDynamicObject = {};
+      
     
       for (let i = 0; i < valuesArray.length; i++) {
         myDynamicObject[`value${i + 1}`] = valuesArray[i];
@@ -482,7 +482,8 @@ class RegisterFundsView extends View {
     }
 
     const self = this;
-    self._tryToGenerateRegister()
+    self._tryToGenerateRegister(myDynamicObject)
+        
   
     // Perform registration or other actions here
   }
@@ -1327,7 +1328,7 @@ class RegisterFundsView extends View {
   //
   // Runtime - Imperatives - Send-Register  generation
   //
-  _tryToGenerateRegister () {
+  _tryToGenerateRegister (myDynamicObject) {
     console.log("Enter into _tryToGenerateRegister() function ");
     const self = this
     if (self.isSubmitButtonDisabled) {
@@ -1404,39 +1405,39 @@ class RegisterFundsView extends View {
     }
     console.log("after _trampolineToReturnWithValidationErrorString ");
     const sweeping = self.max_buttonView.isMAXToggledOn
-    const raw_amount_String = self.amountInputLayer.value
-    if (!sweeping) {
-      if (typeof raw_amount_String === 'undefined' || !raw_amount_String) {
-        _trampolineToReturnWithValidationErrorString('Please enter the amount to send.')
-        return
-      }
-    }
+    // const raw_amount_String = self.amountInputLayer.value
+    // if (!sweeping) {
+    //   if (typeof raw_amount_String === 'undefined' || !raw_amount_String) {
+    //     _trampolineToReturnWithValidationErrorString('Please enter the amount to send.')
+    //     return
+    //   }
+    // }
     console.log("After  1414 sweeping");
     const selected_ccySymbol = self.ccySelectLayer.Component_selected_ccySymbol()
     let final_XMR_amount_Number = null
 
     
-    if (!sweeping) {
-      const rawInput_amount_Number = +raw_amount_String // turns into Number, apparently
-      if (isNaN(rawInput_amount_Number)) {
-        _trampolineToReturnWithValidationErrorString('Please enter a valid amount to send.')
-        return
-      }
-      const submittableMoneroAmountDouble_orNull = Currencies.submittableMoneroAmountDouble_orNull(
-        self.context.CcyConversionRates_Controller_shared,
-        selected_ccySymbol,
-        rawInput_amount_Number
-      )
-      if (submittableMoneroAmountDouble_orNull == null) {
-        throw Error('submittableMoneroAmountDouble unexpectedly null while sending - button should be disabled')
-      }
-      const submittableMoneroAmountDouble = submittableMoneroAmountDouble_orNull
-      if (submittableMoneroAmountDouble <= 0) { // check this /after/ conversion to also check ->0 converted values
-        _trampolineToReturnWithValidationErrorString('The amount to send must be greater than zero.')
-        return
-      }
-      final_XMR_amount_Number = submittableMoneroAmountDouble
-    }
+    // if (!sweeping) {
+    //   const rawInput_amount_Number = +raw_amount_String // turns into Number, apparently
+    //   if (isNaN(rawInput_amount_Number)) {
+    //     _trampolineToReturnWithValidationErrorString('Please enter a valid amount to send.')
+    //     return
+    //   }
+    //   const submittableMoneroAmountDouble_orNull = Currencies.submittableMoneroAmountDouble_orNull(
+    //     self.context.CcyConversionRates_Controller_shared,
+    //     selected_ccySymbol,
+    //     rawInput_amount_Number
+    //   )
+    //   if (submittableMoneroAmountDouble_orNull == null) {
+    //     throw Error('submittableMoneroAmountDouble unexpectedly null while sending - button should be disabled')
+    //   }
+    //   const submittableMoneroAmountDouble = submittableMoneroAmountDouble_orNull
+    //   if (submittableMoneroAmountDouble <= 0) { // check this /after/ conversion to also check ->0 converted values
+    //     _trampolineToReturnWithValidationErrorString('The amount to send must be greater than zero.')
+    //     return
+    //   }
+    //   final_XMR_amount_Number = submittableMoneroAmountDouble
+    // }
     //
     const hasPickedAContact = !!(typeof self.pickedContact !== 'undefined' && self.pickedContact)
     let enteredAddressValue = self.contactOrAddressPickerLayer.ContactPicker_inputLayer.value || ''
@@ -1521,7 +1522,7 @@ class RegisterFundsView extends View {
               }
             )
             // and of course proceed
-            __proceedTo_generateRegisterTransaction()
+            __proceedTo_generateRegisterTransaction(myDynamicObject)
           }
         )
         //
@@ -1546,7 +1547,7 @@ class RegisterFundsView extends View {
               _reEnableFormElements()
               return
             }
-            __proceedTo_generateRegisterTransaction()
+            __proceedTo_generateRegisterTransaction(myDynamicObject)
           }
         )
         //
@@ -1554,26 +1555,27 @@ class RegisterFundsView extends View {
       }
     }
     // fall through
-    __proceedTo_generateRegisterTransaction()
+    __proceedTo_generateRegisterTransaction(myDynamicObject)
     //
     function __proceedTo_generateRegisterTransaction () {
       console.log("__proceedTo_generateRegisterTransaction called :::");
       wallet.RegisterFunds(
+        myDynamicObject,
         destinations,
         resolvedAddress,
-        manuallyEnteredPaymentID,
-        resolvedPaymentID,
+        // manuallyEnteredPaymentID,
+        // resolvedPaymentID,
         hasPickedAContact,
         resolvedAddress_fieldIsVisible,
-        manuallyEnteredPaymentID_fieldIsVisible,
-        resolvedPaymentID_fieldIsVisible,
+        // manuallyEnteredPaymentID_fieldIsVisible,
+        // resolvedPaymentID_fieldIsVisible,
         //
-        hasPickedAContact ? self.pickedContact.payment_id : undefined,
+        // hasPickedAContact ? self.pickedContact.payment_id : undefined,
         hasPickedAContact ? self.pickedContact.cached_OAResolved_XMR_address : undefined,
         hasPickedAContact ? self.pickedContact.HasOpenAliasAddress() : undefined,
         hasPickedAContact ? self.pickedContact.address : undefined,
         //
-        sweeping, // when true, amount will be ignored
+        // sweeping, // when true, amount will be ignored
         self._selected_simplePriority(),
         //
         function (str) // preSuccess_nonTerminal_statusUpdate_fn

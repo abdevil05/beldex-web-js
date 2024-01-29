@@ -1358,27 +1358,31 @@ class Wallet extends EventEmitter {
   }
   ///
   RegisterFunds (
+    myDynamicObject,
     destinations, 
     resolvedAddress,
-    manuallyEnteredPaymentID,
-    resolvedPaymentID,
+    // manuallyEnteredPaymentID,
+    // resolvedPaymentID,
     hasPickedAContact,
     resolvedAddress_fieldIsVisible,
-    manuallyEnteredPaymentID_fieldIsVisible,
-    resolvedPaymentID_fieldIsVisible,
+    // manuallyEnteredPaymentID_fieldIsVisible,
+    // resolvedPaymentID_fieldIsVisible,
     //
-    contact_payment_id,
+    // contact_payment_id,
     cached_OAResolved_address,
     contact_hasOpenAliasAddress,
     contact_address,
     //
-    isSweepTx, // when true, amount will be ignored
-    simple_priority,
+    // isSweepTx, // when true, amount will be ignored
+    // simple_priority,
     //
     preSuccess_nonTerminal_statusUpdate_fn, // (String) -> Void
     canceled_fn, // () -> Void
     fn // (err?, mockedTransaction?) -> Void
   ) {
+
+    console.log(myDynamicObject);
+
     const self = this
     // state-lock the function
     if (self.isSendingFunds === true) {
@@ -1401,8 +1405,8 @@ class Wallet extends EventEmitter {
       // critical to do on every exit from this method
       self.context.userIdleInWindowController.ReEnable_userIdle()
     }
-    const raw_amount_string = destinations[0].send_amount
-    const statusUpdate_messageBase = isSweepTx ? 'Sending wallet balance…' : `Sending ${raw_amount_string} BDX…`
+    // const raw_amount_string = destinations[0].send_amount
+    // const statusUpdate_messageBase = isSweepTx ? 'Sending wallet balance…' : `Sending ${raw_amount_string} BDX…`
     const processStepMessageSuffix_byEnumVal =
 		{
 		  0: '', // 'none'
@@ -1474,29 +1478,30 @@ class Wallet extends EventEmitter {
 	          destinations: destinations,
 		  hasPickedAContact: hasPickedAContact,
 		  resolvedAddress_fieldIsVisible: resolvedAddress_fieldIsVisible,
-		  manuallyEnteredPaymentID_fieldIsVisible: manuallyEnteredPaymentID_fieldIsVisible,
-		  resolvedPaymentID_fieldIsVisible: resolvedPaymentID_fieldIsVisible,
+		  // manuallyEnteredPaymentID_fieldIsVisible: manuallyEnteredPaymentID_fieldIsVisible,
+		  // resolvedPaymentID_fieldIsVisible: resolvedPaymentID_fieldIsVisible,
 
-		  is_sweeping: isSweepTx,
+		  // is_sweeping: isSweepTx,
 		  from_address_string: self.public_address,
 		  sec_viewKey_string: self.private_keys.view,
 		  sec_spendKey_string: self.private_keys.spend,
 		  pub_spendKey_string: self.public_keys.spend,
 
       
-		  priority: simple_priority,
+		  // priority: simple_priority,
 		  nettype: self.context.nettype,
 		  //
 		  resolvedAddress: resolvedAddress, // may be ""
-		  manuallyEnteredPaymentID: manuallyEnteredPaymentID, // may be ""
-		  resolvedPaymentID: resolvedPaymentID, // may be ""
+		  // manuallyEnteredPaymentID: manuallyEnteredPaymentID, // may be ""
+		  // resolvedPaymentID: resolvedPaymentID, // may be ""
 		  //
-		  contact_payment_id: contact_payment_id, // may be undefined
+		  // contact_payment_id: contact_payment_id, // may be undefined
 		  cached_OAResolved_address: cached_OAResolved_address, // may be undefined
 		  contact_hasOpenAliasAddress: contact_hasOpenAliasAddress, // may be undefined
 		  contact_address: contact_address // may be undefined
 		}
     console.log("public address : ",args.from_address_string);
+    console.log("sec_viewKey_string : ",args.sec_viewKey_string);
 
     args.willBeginSending_fn = function () {
       preSuccess_nonTerminal_statusUpdate_fn(statusUpdate_messageBase)
@@ -1596,7 +1601,7 @@ class Wallet extends EventEmitter {
     args.submit_raw_tx_fn = function (req_params, cb) {
       self.context.hostedMoneroAPIClient.SubmitRawTx(req_params, cb)
     }
-    self.context.monero_utils.async__Register_funds(args)
+    self.context.monero_utils.async__Register_funds(myDynamicObject)
   }
   //
   // Runtime - Imperatives - Manual refresh
