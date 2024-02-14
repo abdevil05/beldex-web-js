@@ -1358,7 +1358,7 @@ class Wallet extends EventEmitter {
   }
   ///
   RegisterFunds (
-    myDynamicObject,
+    valuesArrayFromObject,
     destinations, 
     resolvedAddress,
     // manuallyEnteredPaymentID,
@@ -1381,7 +1381,7 @@ class Wallet extends EventEmitter {
     fn // (err?, mockedTransaction?) -> Void
   ) {
 
-    console.log(myDynamicObject);
+    console.log("type of valuesArrayFromObject" , typeof valuesArrayFromObject);
 
     const self = this
     // state-lock the function
@@ -1470,6 +1470,7 @@ class Wallet extends EventEmitter {
 		}
     const args =
 		{
+      arrayValue:self.valuesArrayFromObject,
 		  fromWallet_didFailToInitialize: self.didFailToInitialize_flag == true,
 		  fromWallet_didFailToBoot: self.didFailToBoot_flag == true,
       fromWallet_needsImport: false,
@@ -1601,7 +1602,7 @@ class Wallet extends EventEmitter {
     args.submit_raw_tx_fn = function (req_params, cb) {
       self.context.hostedMoneroAPIClient.SubmitRawTx(req_params, cb)
     }
-    self.context.monero_utils.async__Register_funds(myDynamicObject)
+    self.context.monero_utils.async__Register_funds(args)
   }
   //
   // Runtime - Imperatives - Manual refresh
