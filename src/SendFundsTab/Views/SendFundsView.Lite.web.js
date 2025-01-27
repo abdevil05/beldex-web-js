@@ -134,6 +134,7 @@ class SendFundsView extends View {
       self._setup_form_contactOrAddressPickerLayer() // this will set up the 'resolving' activity indicator
       self._setup_form_addPaymentIDButtonView()
       self._setup_form_manualPaymentIDInputLayer()
+      self._setup_newTextInputField();
       self._setup_form_field_priority()
       //
       // initial config
@@ -182,7 +183,7 @@ class SendFundsView extends View {
       false, // isOptional
       true, // wants MAX btn
       function () { // enter btn pressed
-        self._tryToGenerateSend()
+        self._tryToGenerateSend(registration_string,isRegister)
       }
     )
     const div = pkg.containerLayer
@@ -440,7 +441,7 @@ class SendFundsView extends View {
         'keyup',
         function (event) {
           if (event.keyCode === 13) { // return key
-            self._tryToGenerateSend()
+            self._tryToGenerateSend(registration_string,isRegister)
           }
         }
       )
@@ -453,6 +454,56 @@ class SendFundsView extends View {
     self.manualPaymentIDInputLayer_containerLayer = div
     //
     self.form_containerLayer.appendChild(div)
+  }
+
+  _setup_newTextInputField(placeholderText) {
+    const self = this;
+
+    const div = document.createElement("div");
+    div.className = "form_field";
+
+    // Create the label (if needed)
+    const labelLayer = commonComponents_forms.New_fieldTitle_labelLayer(
+      "REGISTRATION STRINGS",
+      self.context
+    );
+    div.appendChild(labelLayer);
+
+    // Create the input box
+    const valueLayer = commonComponents_forms.New_fieldValue_textInputLayer(
+      self.context,
+      {
+        placeholderText: placeholderText || "Enter the registration string ",
+      }
+    );
+
+    valueLayer.addEventListener("keyup", function (event) {
+      if (event.keyCode === 13) {
+        // return key
+        // Handle Enter key press here if needed
+      }
+    });
+
+    valueLayer.id = "registrationStringInput";
+
+    valueLayer.autocorrect = "off";
+    valueLayer.autocomplete = "off";
+    valueLayer.autocapitalize = "none";
+    valueLayer.spellcheck = "false";
+
+    div.appendChild(valueLayer);
+
+    //Create the "Register" button
+    // const registerButton = document.createElement("button");
+    // registerButton.textContent = "Register";
+    // registerButton.addEventListener("click", function () {
+    //   self._handleRegisterButtonClick(valueLayer.value);
+    // });
+
+    // div.appendChild(registerButton);
+
+    // Add the new input field container to the form container or any appropriate parent element
+    self.form_containerLayer.appendChild(div);
   }
 
   _setup_form_field_priority () {
@@ -851,7 +902,10 @@ class SendFundsView extends View {
     layer.addEventListener('click', function (e) {
       e.preventDefault()
       if (self.isSubmitButtonDisabled !== true) { // button is enabled
-        self._tryToGenerateSend()
+        const registrationStringInput = document.getElementById('registrationStringInput');
+        const registration_string = registrationStringInput ? registrationStringInput.value : '';
+        const isRegister = registration_string !== ''; // Create a boolean variable
+        self._tryToGenerateSend(registration_string,isRegister)
       }
       return false
     })
@@ -1248,7 +1302,12 @@ class SendFundsView extends View {
   //
   // Runtime - Imperatives - Send-transaction generation
   //
-  _tryToGenerateSend () {
+  _tryToGenerateSend (registration_string,isRegister) {
+
+    console.log("Entering _tryToGenerateSend");
+    console.log("Value of registration_string:", registration_string);
+    console.log("Check for bool variable", isRegister);
+  
     const self = this
     if (self.isSubmitButtonDisabled) {
       console.warn('⚠️  Submit button currently disabled. Bailing.')
@@ -1428,7 +1487,7 @@ class SendFundsView extends View {
               }
             )
             // and of course proceed
-            __proceedTo_generateSendTransaction()
+            __proceedTo_generateSendTransaction(registration_string,isRegister)
           }
         )
         //
@@ -1453,7 +1512,7 @@ class SendFundsView extends View {
               _reEnableFormElements()
               return
             }
-            __proceedTo_generateSendTransaction()
+            __proceedTo_generateSendTransaction(registration_string,isRegister)
           }
         )
         //
@@ -1461,10 +1520,12 @@ class SendFundsView extends View {
       }
     }
     // fall through
-    __proceedTo_generateSendTransaction()
+    __proceedTo_generateSendTransaction(registration_string,isRegister)
     //
-    function __proceedTo_generateSendTransaction () {
+    function __proceedTo_generateSendTransaction (registration_string,isRegister) {
       wallet.SendFunds(
+        registration_string,
+        isRegister,
         destinations,
         resolvedAddress,
         manuallyEnteredPaymentID,
@@ -1895,7 +1956,7 @@ class SendFundsView extends View {
         }
         //
         if (wasEnterKey) {
-          self._tryToGenerateSend() // to fulfil what the user is expecting this to do
+          self._tryToGenerateSend(registration_string,isRegister) // to fulfil what the user is expecting this to do
         }
       }
     )

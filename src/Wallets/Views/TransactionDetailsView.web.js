@@ -304,7 +304,7 @@ class TransactionDetailsView extends View {
         if (transaction.isFailed) {
           valueString = 'REJECTED'
         } else if (transaction.isConfirmed !== true) {
-          valueString = 'PENDING'
+          valueString = 'PENDIG'
         } else {
           valueString = 'CONFIRMED'
         }

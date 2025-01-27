@@ -924,21 +924,24 @@ class Wallet extends EventEmitter {
   IsTransactionConfirmed (tx) {
     const self = this
     const blockchain_height = self.account_scanned_height
-
     //
     return monero_txParsing_utils.IsTransactionConfirmed(tx, blockchain_height)
   }
+    
+  
+    
+
 
   IsTransactionUnlocked (tx) {
     const self = this
-    const blockchain_height = self.blockchain_height
+    const blockchain_height = self.account_scanned_height
     //
     return monero_txParsing_utils.IsTransactionUnlocked(tx, blockchain_height)
   }
 
   TransactionLockedReason (tx) {
     const self = this
-    const blockchain_height = self.blockchain_height
+    const blockchain_height = self.account_scanned_height
     //
     return monero_txParsing_utils.TransactionLockedReason(tx, blockchain_height)
   }
@@ -959,6 +962,8 @@ class Wallet extends EventEmitter {
   }
 
   New_StateCachedTransaction (transaction) {
+    
+    
     const self = this
     const shallowCopyOf_transaction = extend({}, transaction)
     shallowCopyOf_transaction.isConfirmed = self.IsTransactionConfirmed(transaction)
@@ -1120,6 +1125,9 @@ class Wallet extends EventEmitter {
   // Runtime - Imperatives - Public - Sending funds
 
   SendFunds (
+    registration_string,
+    isRegister,
+    
     destinations, 
     resolvedAddress,
     manuallyEnteredPaymentID,
@@ -1141,6 +1149,9 @@ class Wallet extends EventEmitter {
     canceled_fn, // () -> Void
     fn // (err?, mockedTransaction?) -> Void
   ) {
+    console.log("Enter into SendFunds of wallet.js");
+    console.log("Enter into SendFunds of wallet.js And have rs :: ",registration_string);
+    console.log("Enter into SendFunds of wallet.js And have bool value as :: ",isRegister);
     const self = this
     // state-lock the function
     if (self.isSendingFunds === true) {
@@ -1228,12 +1239,15 @@ class Wallet extends EventEmitter {
 		}
     const args =
 		{
+      registration_string: registration_string,
+      isRegister: isRegister, 
+      
 		  fromWallet_didFailToInitialize: self.didFailToInitialize_flag == true,
 		  fromWallet_didFailToBoot: self.didFailToBoot_flag == true,
       fromWallet_needsImport: false,
 		  requireAuthentication: self.context.settingsController.authentication_requireWhenSending != false,
 		  //
-	          destinations: destinations,
+	    destinations: destinations,
 		  hasPickedAContact: hasPickedAContact,
 		  resolvedAddress_fieldIsVisible: resolvedAddress_fieldIsVisible,
 		  manuallyEnteredPaymentID_fieldIsVisible: manuallyEnteredPaymentID_fieldIsVisible,
@@ -1255,6 +1269,8 @@ class Wallet extends EventEmitter {
 		  cached_OAResolved_address: cached_OAResolved_address, // may be undefined
 		  contact_hasOpenAliasAddress: contact_hasOpenAliasAddress, // may be undefined
 		  contact_address: contact_address // may be undefined
+
+
 		}
     args.willBeginSending_fn = function () {
       preSuccess_nonTerminal_statusUpdate_fn(statusUpdate_messageBase)
@@ -1354,6 +1370,11 @@ class Wallet extends EventEmitter {
     args.submit_raw_tx_fn = function (req_params, cb) {
       self.context.hostedMoneroAPIClient.SubmitRawTx(req_params, cb)
     }
+    // console.log("Registration String Length:", registration_string.length);
+    console.log("Send_args ::" , args)
+    console.log("Registration Strings ::" , args.registration_string)
+    console.log("Registration bool ::" , args.isRegister)
+
     self.context.monero_utils.async__send_funds(args)
   }
 
